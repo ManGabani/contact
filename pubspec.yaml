@@ -41,6 +41,7 @@ dependencies:
   sqflite:
   grouped_list:
   shared_preferences:
+  flutter_phone_direct_caller: ^2.1.1
 
 
 dev_dependencies:

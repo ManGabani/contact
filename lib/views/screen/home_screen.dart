@@ -1,277 +1,370 @@
-import 'package:contact/constants/colors.dart';
-import 'package:contact/constants/strings.dart';
-import 'package:contact/controller/auth-controllers/auth-controller.dart';
-import 'package:contact/controller/contact_controller.dart';
-import 'package:contact/controller/local-stroage-controller/local_storage_controller.dart';
-import 'package:contact/model/Lisrstroage.dart';
-import 'package:contact/model/credential.dart';
-import 'package:contact/views/widget/buttons/custom_buttons/savebutton.dart';
-import 'package:contact/views/widget/form/contact_form.dart';
-import 'package:contact/views/widget/inputs/custom_input.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:grouped_list/grouped_list.dart';
+  import 'package:contact/constants/colors.dart';
+  import 'package:contact/constants/strings.dart';
+  import 'package:contact/controller/auth-controllers/auth-controller.dart';
+  import 'package:contact/controller/contact_controller.dart';
+  import 'package:contact/controller/local-stroage-controller/local_storage_controller.dart';
+  import 'package:contact/model/Lisrstroage.dart';
+  import 'package:contact/model/credential.dart';
+  import 'package:contact/views/widget/form/contact_form.dart';
+  import 'package:contact/views/widget/inputs/custom_input.dart';
+  import 'package:flutter/material.dart';
+  import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+  import 'package:get/get.dart';
+  import 'package:get/get_core/src/get_main.dart';
 
-import '../widget/contact_widget/Contact_Widget.dart';
 
-class HomeScreen extends StatelessWidget with Lists {
-  HomeScreen({super.key});
+  class HomeScreen extends StatelessWidget with Lists {
+    HomeScreen({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    final AuthController ctrl = Get.find<AuthController>();
+    @override
+    Widget build(BuildContext context) {
+      final AuthController ctrl = Get.find<AuthController>();
 
-    final ContactController conctrl = Get.put(ContactController());
+      final ContactController conctrl = Get.put(ContactController());
 
-    LocalStorage? storage;
+      LocalStorage? storage;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Obx(() {
-          if (conctrl.searching) {
-            return TextField(
-              autofocus: true,
-              onChanged: conctrl.searchContact,
-              decoration: InputDecoration(
-                  hintText: 'Search Contacts',
-                  suffix: IconButton(
-                    onPressed: () {
-                      conctrl.resetContacts();
-                      conctrl.searching = false;
-                    },
-                    icon: Icon(Icons.close),
-                  )),
-            );
-          } else {
-            return Text('Contact Book');
-          }
-        }),
-        actions: [
-          Obx(() => Visibility(
-              visible: !conctrl.searching,
-              child: IconButton(
-                  onPressed: () {
-                    conctrl.contacts.clear();
-                    conctrl.searching = true;
-                  },
-                  icon: Icon(Icons.search)))),
-          Obx(() => Visibility(
-            visible: !conctrl.searching,
+      return Scaffold(
+        appBar: AppBar(
+          title: Obx(() {
+            if (conctrl.searching) {
+              return TextField(
+                autofocus: true,
+                onChanged: conctrl.searchContact,
+                decoration: InputDecoration(
+                    hintText: 'Search Contacts',
+                    suffix: IconButton(
+                      onPressed: () {
+                        conctrl.resetContacts();
+                        conctrl.searching = false;
+                      },
+                      icon: Icon(Icons.close),
+                    )),
+              );
+            } else {
+              return Text('Contact Book');
+            }
+          }),
+          actions: [
+            Obx(() => Visibility(
+                visible: !conctrl.searching,
                 child: IconButton(
                     onPressed: () {
-                      showModalBottomSheet(
-                        isScrollControlled: true,
-                        context: context,
-                        builder: (context) {
-                          var keyboard =
-                              MediaQuery.of(context).viewInsets.bottom;
-                          return SingleChildScrollView(
-                            child: Padding(
-                              padding: EdgeInsets.fromLTRB(
-                                  15, 50, 15, 15 + keyboard),
-                              child: Column(
-                                children: [
-                                  Text(
-                                    'ADD CONTACT',
-                                    style: TextStyle(fontSize: 25),
-                                  ),
-                                  SizedBox(
-                                    height: 20,
-                                  ),
-                                  CustomInput(
-                                    labelText: 'First Name',
-                                    controller: ctrl.firstnameCtrl,
-                                  ),
-                                  SizedBox(
-                                    height: 15,
-                                  ),
-                                  CustomInput(
-                                    labelText: 'Last Name',
-                                    controller: ctrl.lastnamedCtrl,
-                                  ),
-                                  SizedBox(
-                                    height: 15,
-                                  ),
-                                  CustomInput(
-                                    labelText: 'Email',
-                                    controller: ctrl.emailCtrl,
-                                  ),
-                                  SizedBox(
-                                    height: 15,
-                                  ),
-                                  CustomInput(
-                                    labelText: 'Phone Number',
-                                    controller: ctrl.phonenumberCtrl,
-                                  ),
-                                  SizedBox(
-                                    height: 30,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      addbutton(
-                                        title: 'Cancle',
-                                        onPressed: () => Text('Cancle'),
-                                      ),
-                                      addbutton(
-                                        title: 'Save',
-                                        onPressed: () {
-                                          conctrl.addContacts(
-                                            Addcontact(
-                                                firstname: ctrl
-                                                    .firstnameCtrl.text
-                                                    .trim(),
-                                                lastname: ctrl
-                                                    .lastnamedCtrl.text
-                                                    .trim(),
-                                                email:
-                                                    ctrl.emailCtrl.text.trim(),
-                                                phonenumber: ctrl
-                                                    .phonenumberCtrl.text
-                                                    .trim()),
-                                          );
-
-                                          ctrl.firstnameCtrl.clear();
-                                          ctrl.lastnamedCtrl.clear();
-                                          ctrl.emailCtrl.clear();
-                                          ctrl.phonenumberCtrl.clear();
-
-
-                                          Navigator.pushReplacementNamed(
-                                              context, Constants.homeRoute);
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                      conctrl.contacts.clear();
+                      conctrl.searching = true;
+                    },
+                    icon: Icon(Icons.search)))),
+            Obx(() => Visibility(
+              visible: !conctrl.searching,
+              child: IconButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        title: Text(
+                          'Add Contact',
+                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                        ),
+                        content: SingleChildScrollView(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              CustomInput(
+                                labelText: 'First Name',
+                                controller: ctrl.firstnameCtrl,
                               ),
-                            ),
-                          );
-                        },
+                              SizedBox(height: 15),
+                              CustomInput(
+                                labelText: 'Last Name',
+                                controller: ctrl.lastnamedCtrl,
+                              ),
+                              SizedBox(height: 15),
+                              CustomInput(
+                                labelText: 'Email',
+                                controller: ctrl.emailCtrl,
+                              ),
+                              SizedBox(height: 15),
+                              CustomInput(
+                                labelText: 'Phone Number',
+                                controller: ctrl.phonenumberCtrl,
+                              ),
+                            ],
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop(); // Close the dialog
+                            },
+                            child: Text('Cancel', style: TextStyle(color: Colors.red)),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              conctrl.addContacts(
+                                Addcontact(
+                                  firstname: ctrl.firstnameCtrl.text.trim(),
+                                  lastname: ctrl.lastnamedCtrl.text.trim(),
+                                  email: ctrl.emailCtrl.text.trim(),
+                                  phonenumber: ctrl.phonenumberCtrl.text.trim(),
+                                ),
+                              );
+                              Navigator.of(context).pop(); // Close dialog after saving
+
+                            },
+                            child: Text('Save', style: TextStyle(color: Colors.blue)),
+                          ),
+                        ],
                       );
                     },
-                    icon: Icon(Icons.add)),
-              )),
-          SizedBox(
-            width: 20,
-          ),
-        ],
-      ),
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            DrawerHeader(
-              child: Center(
-                child: Text(
-                  'User Detail',
-                  style: TextStyle(fontSize: 20, color: Colors.black),
-                ),
+                  );
+                  ctrl.firstnameCtrl.clear();
+                  ctrl.lastnamedCtrl.clear();
+                  ctrl.emailCtrl.clear();
+                  ctrl.phonenumberCtrl.clear();
+                  },
+
+                icon: Icon(Icons.add),
               ),
-            ),
-            ListTile(
-              title: Center(
-                  child: Text(
-                'ID : ${ctrl.user!.id}',
-                style: TextStyle(color: ColorConst.textColor, fontSize: 20),
-              )),
-            ),
-            ListTile(
-              title: Center(
-                  child: Text(
-                'User : ${ctrl.user!.name}',
-                style: TextStyle(color: ColorConst.textColor, fontSize: 20),
-              )),
-            ),
-            ListTile(
-              title: Center(
-                  child: Text(
-                'Username : ${ctrl.user!.username}',
-                style: TextStyle(color: ColorConst.textColor, fontSize: 20),
-              )),
-            ),
-            ListTile(
-              title: Center(
-                  child: Text(
-                'Email : ${ctrl.user!.email}',
-                style: TextStyle(color: ColorConst.textColor, fontSize: 20),
-              )),
-            ),
-            ListTile(
-              onTap: () => Navigator.pushNamedAndRemoveUntil(
-                  context, Constants.ScreenRoute, (route) => false),
-              title: Center(
-                  child: Text(
-                'Log Out',
-                style: TextStyle(color: ColorConst.textColor, fontSize: 20),
-              )),
+            )),
+
+            SizedBox(
+              width: 20,
             ),
           ],
         ),
-      ),
-      body: Obx(
-        () => GroupedListView<Addcontact, String>(
-            shrinkWrap: true,
-            sort: true,
-            elements: conctrl.contacts.value,
-            groupBy: (contact) => contact.firstname[0].toUpperCase(),
-            groupSeparatorBuilder: (String groupByvalue) {
-              return ListTile(
-                title: Text(groupByvalue, style: const TextStyle(fontSize: 15)),
-              );
-            },
-            itemBuilder: (context, contact) {
-              int index = conctrl.contacts.indexOf(contact);
-              return ContactWidget(
-                contact: contact,
-                onUpdate: () {
-                  ctrl.firstnameCtrl.text = conctrl.contacts[index].firstname;
-                  ctrl.phonenumberCtrl.text =
-                      conctrl.contacts[index].phonenumber;
+        drawer: Drawer(
+          child: ListView(
+            children: [
+              DrawerHeader(
+                child: Center(
+                  child: Text(
+                    'User Detail',
+                    style: TextStyle(fontSize: 20, color: Colors.black),
+                  ),
+                ),
+              ),
+              ListTile(
+                title: Center(
+                    child: Text(
+                  'ID : ${ctrl.user!.id}',
+                  style: TextStyle(color: ColorConst.textColor, fontSize: 20),
+                )),
+              ),
+              ListTile(
+                title: Center(
+                    child: Text(
+                  'User : ${ctrl.user!.name}',
+                  style: TextStyle(color: ColorConst.textColor, fontSize: 20),
+                )),
+              ),
+              ListTile(
+                title: Center(
+                    child: Text(
+                  'Username : ${ctrl.user!.username}',
+                  style: TextStyle(color: ColorConst.textColor, fontSize: 20),
+                )),
+              ),
+              ListTile(
+                title: Center(
+                    child: Text(
+                  'Email : ${ctrl.user!.email}',
+                  style: TextStyle(color: ColorConst.textColor, fontSize: 20),
+                )),
+              ),
+              ListTile(
+                onTap: () => Navigator.pushNamedAndRemoveUntil(
+                    context, Constants.ScreenRoute, (route) => false),
+                title: Center(
+                    child: Text(
+                  'Log Out',
+                  style: TextStyle(color: ColorConst.textColor, fontSize: 20),
+                )),
+              ),
+            ],
+          ),
+        ),
+        body: Stack(
+          children: [
+            Image.asset(
+              height: double.infinity,
+              width: double.infinity,
+              'asset/image/back.png',
+              fit: BoxFit.cover,
+            ),
+            Obx(() => ListView.separated(
+                  padding: const EdgeInsets.all(20),
+                  separatorBuilder: (context, index) => Divider(
+                    color: Colors.white,
+                  ),
+                  itemCount: conctrl.contacts.length,
+                  itemBuilder: (context, index) {
+                    final contact = conctrl.contacts[index];
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white70,
+                        border: Border.all(color: Colors.black, width: 2),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: ListTile(
+                        onTap: () {
+                          _callNumber(contact.phonenumber);
+                        },
+                        leading: CircleAvatar(
+                          child: Text(
+                            contact.firstname[0].toUpperCase(),
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          backgroundColor: Colors.blue,
+                        ),
+                        title: Text(
+                          contact.firstname,
+                          style: TextStyle(color: Colors.black),
+                        ),
+                        subtitle: Text(
+                          contact.phonenumber,
+                          style: TextStyle(color: Colors.black),
+                        ),
+
+                        trailing: PopupMenuButton<String>(
+                          onSelected: (value) {
+                            if (value == 'edit') {
+                              showEditContactDialog(context, conctrl, ctrl, index);
+                            } else if (value == 'delete') {
+                              conctrl.deleteContact(index: index);
+                            }
+                          },
+                          itemBuilder: (context) => [
+                            PopupMenuItem(
+                              value: 'edit',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.edit, color: Colors.black),
+                                  SizedBox(width: 10),
+                                  Text('Edit'),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: 'delete',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.delete, color: Colors.black),
+                                  SizedBox(width: 10),
+                                  Text('Delete'),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
 
 
+                  },
+                )),
+          ],
+        ),
+      );
+    }
+  }
 
-                  contactform(context, onSave: (contact) {
-                    contact!.id = conctrl.contacts[index].id;
-                    conctrl.updateContact(contact).then((_) {
-                      conctrl.contacts[index] = contact;
-                    });
-                  });
-                },
-                onDelete: () => conctrl.deleteContact(index: index),
-              );
-            }),
-      ),
+  final AuthController ctrl = Get.find<AuthController>();
+
+  void contactform(BuildContext context,
+      {required void Function(Addcontact? contact) onSave}) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Contactform(
+          onSave: onSave,
+          firstnameCtrl: ctrl.firstnameCtrl,
+          phonenumberCtrl: ctrl.phonenumberCtrl),
     );
   }
-}
 
-final AuthController ctrl = Get.find<AuthController>();
+  class Contact {
+    final String name;
+    final String number;
+    int? id;
 
-void contactform(BuildContext context,
-    {required void Function(Addcontact? contact) onSave}) {
-  showModalBottomSheet(
-    context: context,
-    builder: (context) => Contactform(
-        onSave: onSave,
-        firstnameCtrl: ctrl.firstnameCtrl,
-        phonenumberCtrl: ctrl.phonenumberCtrl),
-  );
-}
+    Contact({required this.name, required this.number, this.id = -1});
 
-class Contact {
-  final String name;
-  final String number;
-  int? id;
+    factory Contact.fromJson(Map<String, dynamic> json) {
+      return Contact(
+        name: json['name'] ?? 'unknown',
+        number: json['number'] ?? 'unknown',
+        id: json['id'] ?? -1,
+      );
+    }
+  }
 
-  Contact({required this.name, required this.number, this.id = -1});
+  void showEditContactDialog(BuildContext context, ContactController conctrl, AuthController ctrl, int index) {
+    ctrl.firstnameCtrl.text = conctrl.contacts[index].firstname;
+    ctrl.phonenumberCtrl.text = conctrl.contacts[index].phonenumber;
 
-  factory Contact.fromJson(Map<String, dynamic> json) {
-    return Contact(
-      name: json['name'] ?? 'unknown',
-      number: json['number'] ?? 'unknown',
-      id: json['id'] ?? -1,
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Text(
+            'Edit Contact',
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CustomInput(
+                labelText: 'First Name',
+                controller: ctrl.firstnameCtrl,
+              ),
+              SizedBox(height: 15),
+              CustomInput(
+                labelText: 'Phone Number',
+                controller: ctrl.phonenumberCtrl,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text('Cancel', style: TextStyle(color: Colors.red)),
+            ),
+            TextButton(
+              onPressed: () {
+                Addcontact updatedContact = Addcontact(
+                  firstname: ctrl.firstnameCtrl.text.trim(),
+                  phonenumber: ctrl.phonenumberCtrl.text.trim(),
+                  lastname: ctrl.lastnamedCtrl.text.trim(),
+                  email: ctrl.emailCtrl.text.trim(),
+                );
+                updatedContact.id = conctrl.contacts[index].id;
+
+                conctrl.updateContact(updatedContact).then((_) {
+                  conctrl.contacts[index] = updatedContact;
+                  Navigator.of(context).pop();
+                });
+              },
+              child: Text('Save', style: TextStyle(color: Colors.blue)),
+            ),
+          ],
+        );
+      },
     );
   }
-}
+    _callNumber(String phoneNumber) async {
+    bool? res = await FlutterPhoneDirectCaller.callNumber(phoneNumber);
+    if (res == null || !res) {
+      print('Call failed');
+    } else {
+      print('Call successful');
+    }
+  }
+

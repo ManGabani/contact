@@ -19,15 +19,21 @@ class ContactWidget extends StatelessWidget {
     return ListTile(
       trailing: PopupMenuButton(
         onSelected: (value) {
-          if(value == 1 && onUpdate!=null){
+          if (value == 1 && onUpdate != null) {
             onUpdate!();
-          }else if(onDelete!=null){
+          } else if (onDelete != null) {
             onDelete!();
           }
         },
         itemBuilder: (context) => [
-          PopupMenuItem(child: Text("Update"),value: 1,),
-          PopupMenuItem( child: Text("Delete"),value: 2,),
+          PopupMenuItem(
+            child: Text("Update"),
+            value: 1,
+          ),
+          PopupMenuItem(
+            child: Text("Delete"),
+            value: 2,
+          ),
         ],
       ),
       title: Text(contact.firstname,

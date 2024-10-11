@@ -17,33 +17,39 @@ class Contactform extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(height: 15,),
-        CustomInput(
-          labelText: 'Name',
-          controller:firstnameCtrl,
-        ),
-        SizedBox(height: 15,),
-        CustomInput(
-          labelText: 'Contact',
-          controller:phonenumberCtrl,
-        ),
-        SizedBox(height: 15,),
-        CustomButton(
-          title: 'Add Contact',
-          onPressed: () {
-            Addcontact contact = Addcontact(
-              firstname:firstnameCtrl.text,
-            lastname:ctrl.lastnamedCtrl.text,
-            email: ctrl.emailCtrl.text,
-            phonenumber:phonenumberCtrl.text,
-            );
-                onSave(contact);
-            Get.back();
-          },
-        )
-      ],
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        children: [
+          SizedBox(height: 15,),
+          CustomInput(
+            labelText: 'Name',
+            controller:firstnameCtrl,
+          ),
+          SizedBox(height: 15,),
+          CustomInput(
+            labelText: 'Contact',
+            controller:phonenumberCtrl,
+          ),
+          SizedBox(height: 15,),
+          CustomButton(
+            title: 'Add Contact',
+            onPressed: () {
+              Addcontact contact = Addcontact(
+                firstname:firstnameCtrl.text,
+              lastname:ctrl.lastnamedCtrl.text,
+              email: ctrl.emailCtrl.text,
+              phonenumber:phonenumberCtrl.text,
+              );
+                  onSave(contact);
+              Get.back();
+            },
+          )
+        ],
+      ),
     );
   }
+
+
+
 }
